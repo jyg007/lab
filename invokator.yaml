@@ -1,0 +1,24 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: invokator
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: invokator
+    spec:
+      volumes:
+      - name: shared
+        persistentVolumeClaim:
+          claimName: shared-pvc
+
+      containers:
+      - name: invokator
+        image: mplccblockchain/invokator:1.4
+        volumeMounts:
+        - mountPath: /shared
+          name: shared
+
