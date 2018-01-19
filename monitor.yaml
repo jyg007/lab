@@ -1,0 +1,24 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: monitor
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: monitor
+    spec:
+      volumes:
+      - name: shared
+        persistentVolumeClaim:
+          claimName: shared-pvc
+
+      containers:
+      - name: monitor
+        image: mplccblockchain/monitor:1.1.1
+        volumeMounts:
+        - mountPath: /shared
+          name: shared
+
