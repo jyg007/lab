@@ -4,13 +4,19 @@ sudo apt-get update
 sudo apt-get install golang
 sudo apt-get install libltdl-dev
 
+echo
 echo "Adding GOPATH to your profile"
 grep GOPATH $HOME/.profile || echo "export GOPATH=/mnt/c/Users/$WINUSER/Desktop" >> $HOME/.profile
 
+echo
 echo "Installing kubectl"
 curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
 chmod +x ./kubectl && sudo mv kubectl /usr/local/bin
 
+K=$(bx cs cluster-config blockchain | grep export  | sed -e 's/.*=//')
+exoirt KUBECONFIG=$K
+
+echo
 echo "Retrieving Hyperledger Code"
 
 WINUSER=$(powershell.exe -Command "get-childitem env:USERNAME " | grep USER | awk -e '{print $2}')
