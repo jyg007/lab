@@ -4,37 +4,32 @@ sudo apt-get update
 sudo apt-get install golang
 sudo apt-get install libltdl-dev
 
+WINUSER=$(powershell.exe -Command "get-childitem env:USERNAME " | grep USER | awk -e '{print $2}')
+
 echo
 echo "Adding GOPATH to your profile"
 grep GOPATH $HOME/.profile || echo "export GOPATH=/mnt/c/Users/$WINUSER/Desktop" >> $HOME/.profile
 
-echo
-echo "Installing kubectl"
-curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
-chmod +x ./kubectl && sudo mv kubectl /usr/local/bin
-
-K=$(bx cs cluster-config blockchain | grep export  | sed -e 's/.*=//')
-exoirt KUBECONFIG=$K
 
 echo
 echo "Retrieving Hyperledger Code"
 
-WINUSER=$(powershell.exe -Command "get-childitem env:USERNAME " | grep USER | awk -e '{print $2}')
 
 cd /mnt/c/Users/$WINUSER/Desktop
-mkdir –p src/github.com/hyperledger
+[ -d src/github.com/hyperledger ] || mkdir –p src/github.com/hyperledger
 cd src/github.com/hyperledger
 git clone https://github.com/hyperledger/fabric.git
 cd fabric
 git checkout tags/v1.0.3
 
-
+echo
 echo "Installing Hello smartcontract"
 cd /mnt/c/Users/$WINUSER/Desktop/src/
 [ -d hello ] || mkdir -p hello
 [ -f hello.go ] || wget http://raw.githubusercontent.com/jyg007/lab/master/hello.go
 
-
+cd
+echo
 echo "Retrieving peer command"
 PEER=$(kubectl get pods | grep org1peer1 | cut -f1 -d " ")
 kubectl cp $PEER:/usr/local/bin/peer .
@@ -42,19 +37,27 @@ kubectl cp $PEER:/usr/local/bin/peer .
 sudo mv peer /usr/local/bin
 sudo chmod +x /usr/local/bin/peer
 
+echo
 echo "Retrieving Admin user certificates from Org1 peer1"
 
 kubectl cp $PEER:/shared/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/ /home/$WINUSER/msp
 
-
+echo
 echo "Setting up your blockchain environnement"
 ORDERER=$(kubectl get pods | grep orderer | cut -f1 -d " ")
 
 grep ORDERER $HOME/.profile || cat << EOF >> $HOME/.profile
-export CORE_PEER_TLS_ENABLED=false" 
+export CORE_PEER_TLS_ENABLED=false
 export ORDERER=$ORDERER:31010
 export CORE_PEER_MSPCONFIGPATH=/home/$WINUSER/msp/
 export CORE_PEER_ADDRESS=$PEER:30110
-export CORE_PEER_LOCALMSPID=Org1MSP   
+export CORE_PEER_LOCALMSPID=Org1MSP  
 EOF
+
+echo
+echo "Creating invokator and monitoring"
+kubectl get pods | grep -i invokator ||  kubectl create -f $HOME/lab/invokator.yaml
+kubectl get services | grep -i invokator ||  kubectl create -f $HOME/lab/invokator-service.yaml
+kubectl get pods | grep -i monitor ||  kubectl create -f $HOME/lab/monitor.yaml
+kubectl get services | grep -i monitor ||  kubectl create -f $HOME/lab/monitoring-service.yaml
 

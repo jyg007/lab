@@ -1,0 +1,18 @@
+WINUSER=$(powershell.exe -Command "get-childitem env:USERNAME " | grep USER | awk -e '{print $2}')
+
+
+echo
+echo "Installing kubectl"
+[ -f /usr/local/bin/kubectl ] || curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+[ -f  ./kubectl ] && chmod +x ./kubectl && sudo mv kubectl /usr/local/bin
+
+K=$(bx cs cluster-config blockchain | grep export  | sed -e 's/.*=//')
+export KUBECONFIG=$K
+
+echo
+echo "Setting up your blockchain environnement"
+
+grep KUBECONFIG $HOME/.profile || cat << EOF >> $HOME/.profile
+export KUBECONFIG=$K 
+EOF
+
