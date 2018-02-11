@@ -16,7 +16,7 @@ echo "Retrieving Hyperledger Code"
 
 
 cd /mnt/c/Users/$WINUSER/Desktop
-[ -d src/github.com/hyperledger ] || mkdir –p src/github.com/hyperledger
+[ -d src/github.com/hyperledger ] || mkdir -p src/github.com/hyperledger
 cd src/github.com/hyperledger
 git clone https://github.com/hyperledger/fabric.git
 cd fabric
@@ -26,6 +26,7 @@ echo
 echo "Installing Hello smartcontract"
 cd /mnt/c/Users/$WINUSER/Desktop/src/
 [ -d hello ] || mkdir -p hello
+cd hello
 [ -f hello.go ] || wget http://raw.githubusercontent.com/jyg007/lab/master/hello.go
 
 cd
