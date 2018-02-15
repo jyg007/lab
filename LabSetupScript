@@ -41,7 +41,7 @@ sudo chmod +x /usr/local/bin/peer
 echo
 echo "Retrieving Admin user certificates from Org1 peer1"
 
-kubectl cp $PEER:/shared/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/ /home/$WINUSER/msp
+kubectl cp $PEER:/shared/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/ $HOME/msp
 
 echo
 echo "Setting up your blockchain environnement"
@@ -50,7 +50,7 @@ ORDERER=$(bx cs workers blockchain | awk '/kube/{ print $2}')
 grep ORDERER $HOME/.profile || cat << EOF >> $HOME/.profile
 export CORE_PEER_TLS_ENABLED=false
 export ORDERER=$ORDERER:31010
-export CORE_PEER_MSPCONFIGPATH=/home/$WINUSER/msp/
+export CORE_PEER_MSPCONFIGPATH=$HOME/msp/
 export CORE_PEER_ADDRESS=$ORDERER:30110
 export CORE_PEER_LOCALMSPID=Org1MSP  
 EOF
