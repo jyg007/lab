@@ -3,13 +3,14 @@ echo "Installing kubectl"
 [ -f /usr/local/bin/kubectl ] || curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
 [ -f  ./kubectl ] && chmod +x ./kubectl && sudo mv kubectl /usr/local/bin
 
+echo "Retrieving the bluemix cluster config"
 K=$(bx cs cluster-config blockchain | grep export  | sed -e 's/.*=//')
-export KUBECONFIG=$K
+echo $K
 
 echo
 echo "Setting up your blockchain environnement"
-
-grep KUBECONFIG $HOME/.profile || cat << EOF >> $HOME/.profile
-export KUBECONFIG=$K 
+[ -f  $HOME/.profile ] && export PROFILE=.profile
+[ -f  $HOME/.bash_profile ] && export PROFILE=.bash_profile
+grep KUBECONFIG $HOME/$PROFILE || cat << EOF >> $HOME/$PROFILE
+export KUBECONFIG=$K
 EOF
-
