@@ -1,6 +1,14 @@
 echo
 echo "Installing kubectl"
-[ -f /usr/local/bin/kubectl ] || curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+
+if [ "$(uname)" == "Linux" ]; then
+        echo "** Sytem Linux "
+        [ -f /usr/local/bin/kubectl ] || curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+fi
+if [ "$(uname)" == "Darwin" ]; then
+        echo "** Sytem Mac OS (Darwin) "
+        [ -f /usr/local/bin/kubectl ] || curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/darwin/amd64/kubectl
+fi
 [ -f  ./kubectl ] && chmod +x ./kubectl && sudo mv kubectl /usr/local/bin
 
 echo "Retrieving the bluemix cluster config"
